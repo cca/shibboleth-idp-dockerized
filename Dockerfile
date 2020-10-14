@@ -1,15 +1,15 @@
 FROM centos:centos7 as temp
 
-ENV java_version=8.0.265 \
-    zulu_version=8.48.0.53 \
-    java_hash=ed32513524b32a83b3b388831c69d1884df5675bd5069c6d1485fd1a060be209 \
-    jetty_version=9.4.29.v20200521 \
-    jetty_hash=01871f2ccffe70b99a4de95411576cc12d0b581b \ 
+ENV java_version=8.0.212 \
+    zulu_version=8.38.0.13 \
+    java_hash=14136019014c020fee0fc13073d00388 \
+    jetty_version=9.4.32.v20200930 \
+    jetty_hash=b7925b37e0ab6264bfbdf51a2b9167cb957c46f4 \
     idp_version=3.4.7 \
     idp_hash=28b235279ebe6a6644436a42d09a63e7f914e3e2d22330d48a1b8d75b5357acb \
     dta_hash=2f547074b06952b94c35631398f36746820a7697 \
-    slf4j_version=1.7.30 \
-    slf4j_hash=b5a4b6d16ab13e34a88fae84c35cd5d68cac922c \
+    slf4j_version=1.7.25 \
+    slf4j_hash=da76ca59f6a57ee3102f8f9bd9cee742973efa8a \
     logback_version=1.2.3 \
     logback_classic_hash=7c4f3c474fb2c041d8028740440937705ebb473a \
     logback_core_hash=864344400c3d4d92dfeb0a305dc87d953677c03c \
@@ -25,7 +25,7 @@ RUN yum -y update \
 
 # Download Java, verify the hash, and install
 RUN wget -q http://cdn.azul.com/zulu/bin/zulu$zulu_version-ca-jdk$java_version-linux_x64.tar.gz \
-    && echo "$java_hash  zulu$zulu_version-ca-jdk$java_version-linux_x64.tar.gz" | sha256sum -c - \
+    && echo "$java_hash  zulu$zulu_version-ca-jdk$java_version-linux_x64.tar.gz" | md5sum -c - \
     && tar -zxvf zulu$zulu_version-ca-jdk$java_version-linux_x64.tar.gz -C /opt \
     && ln -s /opt/zulu$zulu_version-ca-jdk$java_version-linux_x64/jre/ /opt/jre-home
 
@@ -39,7 +39,7 @@ RUN wget -q https://repo1.maven.org/maven2/org/eclipse/jetty/jetty-distribution/
 RUN mkdir -p /opt/shib-jetty-base/modules /opt/shib-jetty-base/lib/ext  /opt/shib-jetty-base/lib/logging /opt/shib-jetty-base/resources \
     && cd /opt/shib-jetty-base \
     && touch start.ini \
-    && /opt/jre-home/bin/java -jar ../jetty-home/start.jar --create-startd --add-to-start=http,https,deploy,ext,annotations,jstl,rewrite
+    && /opt/jre-home/bin/java -jar ../jetty-home/start.jar --add-to-startd=http,https,deploy,ext,annotations,jstl,rewrite
 
 # Download Shibboleth IdP, verify the hash, and install
 RUN wget -q https://shibboleth.net/downloads/identity-provider/$idp_version/shibboleth-identity-provider-$idp_version.tar.gz \
@@ -89,10 +89,10 @@ RUN mkdir /opt/shib-jetty-base/logs \
     
 FROM centos:centos7
 
-LABEL maintainer="Unicon, Inc."\
+LABEL maintainer="Mark Y. Goh"\
       idp.java.version="8.0.212" \
       idp.jetty.version="9.3.27.v20190418" \
-      idp.version="3.4.3"
+      idp.version="3.4.7"
 
 ENV JETTY_HOME=/opt/jetty-home \
     JETTY_BASE=/opt/shib-jetty-base \
